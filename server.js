@@ -25,7 +25,11 @@ http.createServer( function (request, response) {
          response.writeHead(200, {'Content-Type': 'text/html'});	
          
          // Write the content of the file to response body
-         response.write(data.toString());		
+	response.write('<html>')
+	response.write('<body>')
+         response.write(data.toString());
+	response.write('</body>');
+	response.write('<html>');		
       }
       // Send the response body 
       response.end();
