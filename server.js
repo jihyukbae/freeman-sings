@@ -1,40 +1,48 @@
 var http = require('http');
 var fs = require('fs');
-var url = require('url');
+var formidable = require("formidable");
+var util = require('util');
 
+var server = http.createServer(function (req, res) {
+    if (req.method.toLowerCase() == 'get') {
+        displayForm(res);//the server will call the function displayForm()
+	//res is the response sent back to the client
+    } else if (req.method.toLowerCase() == 'post') {
+        processAllFieldsOfTheForm(req, res);
+    }
 
-// Create a server
-http.createServer( function (request, response) {  
-   // Parse the request containing file name
-   var pathname = url.parse(request.url).pathname;
-   
-   // Print the name of the file for which request is made.
-   console.log("Request for " + pathname + " received.");
-   
-   // Read the requested file content from file system
-   fs.readFile(pathname.substr(1), function (err, data) {
-      if (err) {
-         console.log(err);
-         // HTTP Status: 404 : NOT FOUND
-         // Content Type: text/plain
-         response.writeHead(404, {'Content-Type': 'text/html'});
-      }else{	
-         //Page found	  
-         // HTTP Status: 200 : OK
-         // Content Type: text/plain
-         response.writeHead(200, {'Content-Type': 'text/html'});	
-         
-         // Write the content of the file to response body
-	response.write('<html>')
-	response.write('<body>')
-         response.write(data.toString());
-	response.write('</body>');
-	response.write('<html>');		
-      }
-      // Send the response body 
-      response.end();
-   });   
-}).listen(8081);
+});
 
-// Console will print the message
-console.log('Server running at http://127.0.0.1:8081/');
+function displayForm(res) {
+    fs.readFile('index.html', function (err, data) {
+//index.html has the HTML code to build the form fields, which will be registered
+//by the user
+        res.writeHead(200, {
+            'Content-Type': 'text/html',
+                'Content-Length': data.length
+        });
+        res.write(data);
+        res.end();
+    });
+}
+
+function processAllFieldsOfTheForm(req, res) {
+    var form = new formidable.IncomingForm();
+
+    form.parse(req, function (err, fields, files) {
+        //Store the data from the fields in your data store.
+        //The data store could be a file or database or any other store based
+        //on your application.
+        res.writeHead(200, {
+            'content-type': 'text/plain'
+        });
+        res.write('received the data:\n\n');
+        res.end(util.inspect({
+            fields: fields,
+            files: files
+        }));
+    });
+}
+
+server.listen(1185); //server port 
+console.log("server listening on 1185");
