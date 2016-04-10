@@ -1,4 +1,4 @@
-# ji-bae-bitcamp
+# Freeman Sings
 
 Discover Morgan Freeman's sexy voice in a new way!
 
